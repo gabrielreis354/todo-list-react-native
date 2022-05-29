@@ -5,9 +5,9 @@ SQLite.DEBUG(true);
 SQLite.enablePromise(true);
 
 //Variáveis de conexão/criação do banco de dados
-const database_name = 'Tasks_DB'; //Nome do banco de dados
+const database_name = 'Tasks_DB'; //titulo do banco de dados
 const database_version = '1.0'; //Versão do banco de dados
-const database_displayname = 'SQLite React Offline Database Tasks'; //Nome de exibição do banco de dados
+const database_displayname = 'SQLite React Offline Database Tasks'; //titulo de exibição do banco de dados
 const database_size = 200000; //tamanho do banco de dados
 
 //TODO - FUTURAMENTE IMPLEMENTAR API OU FAZER JOIN EM BAIXO CRIAR CADA FUNCAO PARA CADA TELA OU CATEGORIA
@@ -44,10 +44,10 @@ export default class TaskDatabase {
                   );
                   db.transaction(tx => {
                     tx.executeSql(
-                      'CREATE TABLE IF NOT EXISTS tb01_usuario (tb01_id INTEGER PRIMARY KEY AUTOINCREMENT, tb01_nome_usuario varchar(30), tb01_email varchar(30), tb01_senha varchar(30) )',
+                      'CREATE TABLE IF NOT EXISTS tb01_usuario (tb01_id INTEGER PRIMARY KEY AUTOINCREMENT, tb01_email varchar(30), tb01_senha varchar(30) )',
                     );
                     tx.executeSql(
-                      'CREATE TABLE IF NOT EXISTS tb02_locais (tb02_id INTEGER PRIMARY KEY AUTOINCREMENT, tb02_nome varchar(30), tb02_status varchar(30), tb02_categoria varchar(30), tb02_tarefa varchar(30), tb02_conteudo varchar(30), tb02_gravidade varchar(30), tb02_data varchar(30) )',
+                      'CREATE TABLE IF NOT EXISTS tb02_locais (tb02_id INTEGER PRIMARY KEY AUTOINCREMENT, tb02_titulo varchar(30),  tb02_local varchar(30),  tb02_descricao varchar(30), tb02_imagem TEXT, tb02_data date)',
                     );
                   })
                     .then(() => {
@@ -94,8 +94,8 @@ export default class TaskDatabase {
           db.transaction(tx => {
             //Query SQL para atualizar um dado no banco
             tx.executeSql(
-              'INSERT INTO tb01_usuario (tb01_nome_usuario, tb01_email, tb01_senha) VALUES ( ?, ?, ? )',
-              [user.nome, user.email, user.senha],
+              'INSERT INTO tb01_usuario (tb01_email, tb01_senha) VALUES ( ?, ? )',
+              [user.email, user.senha],
             ).then(([tx, results]) => {
               resolve(results);
             });
@@ -149,27 +149,23 @@ export default class TaskDatabase {
           db.transaction(tx => {
             //Query SQL para inserir um novo produto
             tx.executeSql(
-              'INSERT INTO tb02_locais (tb02_nome, tb02_status, tb02_categoria, tb02_tarefa, tb02_conteudo, tb02_gravidade, tb02_data ) VALUES ( ?, ?, ?, ?, ?, ?, ? )',
+              'INSERT INTO tb02_locais (tb02_titulo, tb02_local, tb02_descricao, tb02_imagem, tb02_data ) VALUES ( ?, ?, ?, ?, ? )',
               [
-                task.nome,
-                task.status,
-                task.categoria,
-                task.tarefa,
-                task.conteudo,
-                task.gravidade,
+                task.titulo,
+                task.local,
+                task.descricao,
+                task.imagem,
                 task.data,
               ],
             ).then(([tx, results]) => {
               resolve(results);
             });
             console.log(
-              task.nome,
-              task.status,
-              task.categoria,
-              task.tarefa,
-              task.conteudo,
-              task.gravidade,
-              task.data,
+              task.titulo,
+              task.local,
+              task.descricao,
+              task.imagem,
+              task.data
             );
           })
             .then(result => {
@@ -199,64 +195,21 @@ export default class TaskDatabase {
                 var len = results.rows.length;
                 for (let i = 0; i < len; i++) {
                   let row = results.rows.item(i);
-                  const { //mesmo nome da sua coluna na tabela
+                  const { //mesmo titulo da sua coluna na tabela
                     tb02_id,
-                    tb02_nome,
-                    tb02_status,
-                    tb02_categoria,
-                    tb02_tarefa,
-                    tb02_conteudo,
-                    tb02_gravidade,
+                    tb02_titulo,
+                    tb02_local,
+                    tb02_descricao,
+                    tb02_imagem,
                     tb02_data,
                   } = row;
                   listaDeTarefas.push({
                     tb02_id,
-                    tb02_nome,
-                    tb02_status,
-                    tb02_categoria,
-                    tb02_tarefa,
-                    tb02_conteudo,
-                    tb02_gravidade,
+                    tb02_titulo,
+                    tb02_local,
+                    tb02_descricao,
+                    tb02_imagem,
                     tb02_data,
-                  });
-                }
-                console.log(listaDeTarefas);
-                resolve(listaDeTarefas);
-              },
-            );
-          })
-            .then(result => {
-              this.Desconectar(db);
-            })
-            .catch(err => {
-              console.log(err);
-            });
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    });
-  }
-
-  //Categorias
-  ListarCategorias() {
-    return new Promise(resolve => {
-      const listaDeTarefas = [];
-      this.Conectar()
-        .then(db => {
-          db.transaction(tx => {
-            //Query SQL para listar os dados da tabela
-            tx.executeSql('SELECT tb02_categoria FROM tb02_locais GROUP BY tb02_categoria', []).then(
-              ([tx, results]) => {
-                console.log('Consulta completa de categorias');
-                var len = results.rows.length;
-                for (let i = 0; i < len; i++) {
-                  let row = results.rows.item(i);
-                  const {
-                    tb02_categoria
-                  } = row;
-                  listaDeTarefas.push({
-                    tb02_categoria
                   });
                 }
                 console.log(listaDeTarefas);
@@ -284,13 +237,11 @@ export default class TaskDatabase {
         .then(db => {
           db.transaction(tx => {
             //Query SQL para atualizar um dado no banco
-            tx.executeSql('UPDATE tb02_locais SET tb02_nome = ?,  tb02_status = ?, tb02_categoria = ?, tb02_tarefa = ?, tb02_conteudo = ?, tb02_gravidade = ?, tb02_data = ?  WHERE tb02_id = ?', [
-              task.nome,
-              task.status,
-              task.categoria,
-              task.tarefa,
-              task.conteudo,
-              task.gravidade,
+            tx.executeSql('UPDATE tb02_locais SET tb02_titulo = ?, tb02_local = ?, tb02_descricao = ?, tb02_iamgem = ?, tb02_data = ?  WHERE tb02_id = ?', [
+              task.titulo,
+              task.local,
+              task.descricao,
+              task.imagem,
               task.data,
               task.id
             ]).then(([tx, results]) => {

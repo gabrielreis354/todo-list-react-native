@@ -16,7 +16,7 @@ export default function TelaCategoria({navigation}) {
 
   const Listar = () => {
     const banco = new TaskDatabase();
-    banco.ListarCategorias().then(listaReparos => {
+    banco.Listar().then(listaReparos => {
       setLista(listaReparos);
     });
   };

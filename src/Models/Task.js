@@ -1,12 +1,10 @@
 /* eslint-disable prettier/prettier */
 export default class Task {
-  constructor(nome, status, categoria, tarefa, conteudo, gravidade, data){
-    this.nome = nome;
-    this.status = status;
-    this.categoria = categoria;
-    this.tarefa = tarefa;
-    this.conteudo = conteudo;
-    this.gravidade = gravidade;
+  constructor(titulo, local, descricao, imagem, data){
+    this.titulo = titulo;
+    this.local = local;
+    this.descricao = descricao;
+    this.imagem = imagem;
     this.data = data;
   }
 }
