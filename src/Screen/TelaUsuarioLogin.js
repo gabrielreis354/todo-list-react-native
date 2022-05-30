@@ -9,11 +9,14 @@ import
   HelperText,
   Snackbar,
 } from 'react-native-paper';
-import React, { useState } from 'react';
-import Banco from '../Database/TaskDatabase'
-import User from '../Models/User'
+import React, { useState, useEffect} from 'react';
+import Banco from '../Database/TaskDatabase';
+import User from '../Models/User';
 
 export default function TelaLogin({navigation}) {
+  //Database consts
+  const [lista, setLista] = useState([]);
+  const banco = new Banco();
   //login consts
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
@@ -21,18 +24,36 @@ export default function TelaLogin({navigation}) {
   const [snackbarText, setText] = useState('');
   const [show, setShow] = useState(true);
   const [visible, setVisible] = useState(false);
-  const onToggleSnackBar = () => setVisible(!visible);
   const onDismissSnackBar = () => setVisible(false);
 
-  const validation = () => {
-    if (email.includes('@') === false || email.includes('.com') === false) {
-      setText('Forneça um endereço de email válido');
-      setVisible(true);
-    }
+  const Login = (mail, password) => {
+    banco.ListarUsuario(mail, password).then(listaUsuarios => {
+      listaUsuarios.map((user) => {
+        if (user.tb01_email === email && user.tb01_senha === pass) {
+          navigation.navigate('TelaCategoria');
+        } else {
+          setText('Usuário não encontrado');
+          setVisible(!show);
+        }
+      });
+    });
   };
 
-  const hasErrors = () => {
-    return !email.includes('@');
+  const validation = () => {
+    if (email === '' && pass === '') {
+      setText('Preencha os campos de email e senha');
+      setVisible(true);
+    } else if (email.includes('@') === false || email.includes('.com') === false) {
+      setText('Forneça um endereço de email válido');
+      setVisible(true);
+    } else if (pass === '') {
+      setText('Preencha o campo senha');
+      setVisible(true);
+    } else if (email !== '' && pass !== '') {
+      Login(email, pass);
+      // navigation.navigate('TelaCategoria');
+    }
+    // navigation.navigate('TelaCategoria');
   };
 
   return (
@@ -62,7 +83,7 @@ export default function TelaLogin({navigation}) {
           </HelperText> */}
           <View>
             <TextInput
-              style={[style.input, {color: 'whited'}]}
+              style={style.input}
               label="Senha"
               value={pass}
               mode={'flat'}
@@ -70,7 +91,7 @@ export default function TelaLogin({navigation}) {
               activeUnderlineColor={'#0F5929'}
               onChangeText={text => setPass(text)}
               secureTextEntry={show}
-              right={<TextInput.Icon name={"eye"} onPress={() => setShow(!show)} />}
+              right={<TextInput.Icon name={'eye'} onPress={() => setShow(!show)} />}
             />
             <Caption style={[style.caption, {marginLeft: 30}]} onPress={() => navigation.navigate('TelaUsuarioCadastro')}>Esqueceu sua senha ?</Caption>
           </View>
