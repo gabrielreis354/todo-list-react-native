@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {Text, View} from 'react-native';
-import React, {Component} from 'react';
+import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import TelaUsuarioLogin from '../Screen/TelaUsuarioLogin';
 import TelaUsuarioCadastro from '../Screen/TelaUsuarioCadastro';
