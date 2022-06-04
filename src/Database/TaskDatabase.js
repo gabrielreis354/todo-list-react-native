@@ -6,11 +6,12 @@ SQLite.enablePromise(true);
 
 //Variáveis de conexão/criação do banco de dados
 const database_name = 'Tasks_DB'; //titulo do banco de dados
-const database_version = '1.0'; //Versão do banco de dados
+const database_version = '6.0'; //Versão do banco de dados
 const database_displayname = 'SQLite React Offline Database Tasks'; //titulo de exibição do banco de dados
 const database_size = 200000; //tamanho do banco de dados
 
 //TODO - FUTURAMENTE IMPLEMENTAR API OU FAZER JOIN EM BAIXO CRIAR CADA FUNCAO PARA CADA TELA OU CATEGORIA
+var dataURi = '';
 
 export default class TaskDatabase {
   /**-Funções Primárias-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**/
@@ -44,10 +45,10 @@ export default class TaskDatabase {
                   );
                   db.transaction(tx => {
                     tx.executeSql(
-                      'CREATE TABLE IF NOT EXISTS tb01_usuario (tb01_id INTEGER PRIMARY KEY AUTOINCREMENT, tb01_email varchar(30), tb01_senha varchar(30) )',
+                      'CREATE TABLE IF NOT EXISTS tb01_usuario (tb01_nome vachar(255), tb01_email varchar(255) PRIMARY KEY, tb01_senha varchar(255) )',
                     );
                     tx.executeSql(
-                      'CREATE TABLE IF NOT EXISTS tb02_locais (tb02_id INTEGER PRIMARY KEY AUTOINCREMENT, tb02_titulo varchar(30),  tb02_local varchar(30),  tb02_descricao varchar(30), tb02_imagem TEXT, tb02_data date)',
+                      'CREATE TABLE IF NOT EXISTS tb02_locais (tb02_id INTEGER PRIMARY KEY AUTOINCREMENT, tb02_titulo varchar(255), tb02_local varchar(255), tb02_categoria varchar(255), tb02_descricao varchar(255), tb02_imagem longblob, tb02_data varchar(255))',
                     );
                   })
                     .then(() => {
@@ -94,8 +95,8 @@ export default class TaskDatabase {
           db.transaction(tx => {
             //Query SQL para atualizar um dado no banco
             tx.executeSql(
-              'INSERT INTO tb01_usuario (tb01_email, tb01_senha) VALUES ( ?, ? )',
-              [user.email, user.senha],
+              'INSERT INTO tb01_usuario (tb01_nome, tb01_email, tb01_senha) VALUES ( ?, ?, ? )',
+              [user.nome, user.email, user.senha],
             ).then(([tx, results]) => {
               resolve(results);
             });
@@ -115,16 +116,33 @@ export default class TaskDatabase {
 
   LoginUsuario(email, senha) {
     return new Promise(resolve => {
+      const listaDeReparos = [];
       this.Conectar()
         .then(db => {
           db.transaction(tx => {
-            //Query SQL para atualizar um dado no banco
-            tx.executeSql(
-              'SELECT * FROM tb01_usuario WHERE tb01_email = ? AND tb01_senha = ?',
-              [email, senha],
-            ).then(([tx, results]) => {
-              resolve(results);
-            });
+            //Query SQL para listar os dados da tabela
+            tx.executeSql('SELECT * FROM tb01_usuario WHERE tb01_email = ? AND tb01_senha = ?',
+            [email, senha]).then(
+              ([tx, results]) => {
+                console.log('Consulta completa');
+                var len = results.rows.length;
+                for (let i = 0; i < len; i++) {
+                  let row = results.rows.item(i);
+                  const { //mesmo titulo da sua coluna na tabela
+                    tb01_nome,
+                    tb01_email,
+                    tb01_senha,
+                  } = row;
+                  listaDeReparos.push({
+                    tb01_nome,
+                    tb01_email,
+                    tb01_senha,
+                  });
+                }
+                console.log(listaDeReparos);
+                resolve(listaDeReparos);
+              },
+            );
           })
             .then(result => {
               this.Desconectar(db);
@@ -138,23 +156,90 @@ export default class TaskDatabase {
         });
     });
   }
+
+  ListarUsuario() {
+    return new Promise(resolve => {
+      const listaDeReparos = [];
+      this.Conectar()
+        .then(db => {
+          db.transaction(tx => {
+            //Query SQL para listar os dados da tabela
+            tx.executeSql('SELECT * FROM tb01_usuario',
+            []).then(
+              ([tx, results]) => {
+                console.log('Consulta completa');
+                var len = results.rows.length;
+                for (let i = 0; i < len; i++) {
+                  let row = results.rows.item(i);
+                  const { //mesmo titulo da sua coluna na tabela
+                    tb01_nome,
+                    tb01_email,
+                    tb01_senha,
+                  } = row;
+                  listaDeReparos.push({
+                    tb01_nome,
+                    tb01_email,
+                    tb01_senha,
+                  });
+                }
+                console.log(listaDeReparos);
+                resolve(listaDeReparos);
+              },
+            );
+          })
+            .then(result => {
+              this.Desconectar(db);
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    });
+  }
+
+  //Update
+  AtualizarUsuario(email, newPass) {
+    return new Promise(resolve => {
+      this.Conectar()
+        .then(db => {
+          db.transaction(tx => {
+            //Query SQL para atualizar um dado no banco
+            tx.executeSql('UPDATE tb01_usuario SET tb01_senha = ? WHERE tb01_email = ?', [
+              newPass,
+              email,
+            ]).then(([tx, results]) => {
+              resolve(results);
+            });
+          }).then(result => {
+              this.Desconectar(db);
+            }).catch(err => {
+              console.log(err);
+            });
+        }).catch(err => {
+          console.log(err);
+        });
+    });
+  }
   /**-Login-Cadastro-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**/
 
   /**-CRUD Suítes-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**/
   //Create
-  Cadastrar(task) {
+  CadastrarSuite(task) {
     return new Promise(resolve => {
       this.Conectar()
         .then(db => {
           db.transaction(tx => {
             //Query SQL para inserir um novo produto
             tx.executeSql(
-              'INSERT INTO tb02_locais (tb02_titulo, tb02_local, tb02_descricao, tb02_imagem, tb02_data ) VALUES ( ?, ?, ?, ?, ? )',
+              'INSERT INTO tb02_locais (tb02_titulo, tb02_local, tb02_categoria, tb02_descricao, tb02_imagem, tb02_data ) VALUES ( ?, ?, "Suítes", ?, ?, ? )',
               [
                 task.titulo,
                 task.local,
                 task.descricao,
-                task.imagem,
+                task.image,
                 task.data,
               ],
             ).then(([tx, results]) => {
@@ -164,8 +249,8 @@ export default class TaskDatabase {
               task.titulo,
               task.local,
               task.descricao,
-              task.imagem,
-              task.data
+              task.image,
+              task.data,
             );
           })
             .then(result => {
@@ -184,7 +269,7 @@ export default class TaskDatabase {
   //Read
   Listar() {
     return new Promise(resolve => {
-      const listaDeTarefas = [];
+      const listaDeReparos = [];
       this.Conectar()
         .then(db => {
           db.transaction(tx => {
@@ -199,21 +284,23 @@ export default class TaskDatabase {
                     tb02_id,
                     tb02_titulo,
                     tb02_local,
+                    tb02_categoria,
                     tb02_descricao,
                     tb02_imagem,
                     tb02_data,
                   } = row;
-                  listaDeTarefas.push({
+                  listaDeReparos.push({
                     tb02_id,
                     tb02_titulo,
                     tb02_local,
+                    tb02_categoria,
                     tb02_descricao,
                     tb02_imagem,
                     tb02_data,
                   });
                 }
-                console.log(listaDeTarefas);
-                resolve(listaDeTarefas);
+                console.log(listaDeReparos);
+                resolve(listaDeReparos);
               },
             );
           })
@@ -230,6 +317,62 @@ export default class TaskDatabase {
     });
   }
 
+  //Read
+  ListarSuites() {
+    return new Promise(resolve => {
+      const listaDeReparos = [];
+      this.Conectar()
+        .then(db => {
+          db.transaction(tx => {
+            //Query SQL para listar os dados da tabela
+            tx.executeSql('SELECT * FROM tb02_locais WHERE tb02_categoria = "Suítes" ').then(
+              ([tx, results]) => {
+                console.log('Consulta completa');
+                var len = results.rows.length;
+                for (let i = 0; i < len; i++) {
+                  let row = results.rows.item(i);
+                  const { //mesmo titulo da sua coluna na tabela
+                    tb02_id,
+                    tb02_titulo,
+                    tb02_local,
+                    tb02_categoria,
+                    tb02_descricao,
+                    tb02_imagem,
+                    tb02_data,
+                  } = row;
+                  listaDeReparos.push({
+                    tb02_id,
+                    tb02_titulo,
+                    tb02_local,
+                    tb02_categoria,
+                    tb02_descricao,
+                    tb02_imagem,
+                    tb02_data,
+                  });
+                }
+                console.log(listaDeReparos);
+                resolve(listaDeReparos);
+              },
+            );
+          })
+            .then(result => {
+              this.Desconectar(db);
+            })
+            .catch(err => {
+              console.log(err);
+            });
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    });
+  }
+
+  
+  SetDataUri(imageUrl) {dataURi = imageUrl;}
+
+  GetDataUri() {return dataURi;}
+
   //Update
   Atualizar(task) {
     return new Promise(resolve => {
@@ -237,11 +380,11 @@ export default class TaskDatabase {
         .then(db => {
           db.transaction(tx => {
             //Query SQL para atualizar um dado no banco
-            tx.executeSql('UPDATE tb02_locais SET tb02_titulo = ?, tb02_local = ?, tb02_descricao = ?, tb02_iamgem = ?, tb02_data = ?  WHERE tb02_id = ?', [
+            tx.executeSql('UPDATE tb02_locais SET tb02_titulo = ?, tb02_local = ?, tb02_descricao = ?, tb02_image = ?, tb02_data = ?  WHERE tb02_id = ?', [
               task.titulo,
               task.local,
               task.descricao,
-              task.imagem,
+              task.image,
               task.data,
               task.id
             ]).then(([tx, results]) => {
@@ -268,7 +411,7 @@ export default class TaskDatabase {
         .then(db => {
           db.transaction(tx => {
             //Query SQL para deletar um item da base de dados
-            tx.executeSql('DELETE FROM tb01_tasks WHERE tb02_id = ?', [id]).then(
+            tx.executeSql('DELETE FROM tb02_locais WHERE tb02_id = ?', [id]).then(
               ([tx, results]) => {
                 console.log(results);
                 resolve(results);
