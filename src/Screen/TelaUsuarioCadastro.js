@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import {View, StyleSheet, Image } from 'react-native';
+import {ScrollView, View, StyleSheet, Image } from 'react-native';
 import
 {
   Text,
@@ -58,7 +58,7 @@ export default function TelaLogin({navigation}) {
 
   return (
     // TODO - Implementar SQlite para Validação de Login
-    <View style={style.background}>
+    <ScrollView style={style.background}>
       <View style={style.wrapper}>
         <View style={style.imageWrapper}>
           <Image
@@ -134,7 +134,7 @@ export default function TelaLogin({navigation}) {
         }}>
         {snackbarText}
       </Snackbar>
-    </View>
+    </ScrollView>
   );
 }
 

@@ -37,12 +37,6 @@ export default function TelaCategoria({navigation}) {
   //   );
   // }
 
-  const handleClick = (category) => {
-    const reparos = new TelaReparos();
-    reparos.setTitle(category);
-    navigation.navigate('Local');
-  };
-
   return (
     <ScrollView style={style.container}>
       <Text style={style.titulo}>Tarefas</Text>
@@ -57,14 +51,28 @@ export default function TelaCategoria({navigation}) {
           <TouchableOpacity
             style={style.btn}
             value={name}
-            onPress={() => handleClick('Suítes')}>
+            onPress={() => navigation.navigate('TelaReparosSuites')}>
             <Text style={style.btnText}>Suítes</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={style.btn}
             value={name}
-            onPress={() => handleClick('Salões')}>
+            onPress={() => console.log('funcional')}>
             <Text style={style.btnText}>Salões</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={style.areaBtn}>
+          <TouchableOpacity
+            style={style.btn}
+            value={name}
+            onPress={() => console.log('funcional')}>
+            <Text style={style.btnText}>Bar</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={style.btn}
+            value={name}
+            onPress={() => console.log('funcional')}>
+            <Text style={style.btnText}>Churrasqueira</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -81,12 +89,13 @@ const style = StyleSheet.create({
     margin: 5,
     fontSize: 24,
     color: 'white',
+    alignSelf: 'center',
   },
   areaBtn: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 10,
   },
   btn: {
     float: 'left',
