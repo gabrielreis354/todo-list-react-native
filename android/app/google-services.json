@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "323371699207",
+    "project_id": "julubitasks",
+    "storage_bucket": "julubitasks.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:323371699207:android:4eb63f032d999248caaea2",
+        "android_client_info": {
+          "package_name": "com.julubitasks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "323371699207-jehem9rvg1bn5u8ovbd72tu0urugsnst.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzJKZu37NP_IRWJx27PGchANnazxHH89A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "323371699207-jehem9rvg1bn5u8ovbd72tu0urugsnst.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
