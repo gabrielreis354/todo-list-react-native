@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
 export default class Task {
-  constructor(titulo, local, descricao, imagem, data){
+  constructor(titulo, local, descricao, image, data){
     this.titulo = titulo;
     this.local = local;
     this.descricao = descricao;
-    this.imagem = imagem;
+    this.image = image;
     this.data = data;
   }
 }
